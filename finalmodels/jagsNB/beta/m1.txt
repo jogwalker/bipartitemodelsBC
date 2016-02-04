@@ -14,8 +14,8 @@
     for (j in 1:Npar) 
     {  
       use[n, j] ~ dbeta(a1[n,j],a2[n,j])
-      a1[n,j] <- mu[n,j]*phi
-      a2[n,j] <- (1-mu[n,j])*phi
+      a1[n,j] <- mu[n,j]*(phi+0.01)
+      a2[n,j] <- (1-mu[n,j])*(phi+0.01)
 
       logit(mu[n,j]) <- alpha[n,j] # linear regression
 
@@ -31,7 +31,7 @@
     HB_invert[j] <- sum(use[, j]) #
   } 
   # prior for phi - beta dist precision parameter
-  phi~dgamma(0.1,0.1)+0.01
+  phi~dgamma(0.1,0.1)
 
   # prior for r, negbinom shape parameter
   r~dgamma(0.1,0.1) 
