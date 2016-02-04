@@ -13,8 +13,8 @@ if [ -n "${1}" ]; then
   PBS_ARRAYID=${1}
 fi
 
-filepath="$HOME/bipartitemodelsBC/finalmodels/beta"
-outdir="~/bipartitemodelsBC/results/beta"
+filepath="$HOME/bipartitemodelsBC/finalmodels/betaT"
+outdir="~/bipartitemodelsBC/results/betaT"
 iter=105000
 burnin=5000
 thin=100
