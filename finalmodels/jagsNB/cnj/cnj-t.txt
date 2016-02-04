@@ -1,0 +1,59 @@
+      model
+{    
+  for (i in 1:Nobs)  
+  { 
+    count[i] ~ dnegbin(Pp[i], r)  
+    Pp[i] <- r/(r+mu.eff[i]) 
+
+    mu.eff[i] <- lambda[i]* use[host.sp[i], par.sp[i]]  
+
+    log(lambda[i]) <- beta[host.sp[i],par.sp[i]] + beta_t*treated[ind[i]] 
+  }   
+
+  for(i in 1:length(missing.ind)) {
+    treated[missing.ind[i]] ~ dbern(0.5)
+  } 
+  
+  for (n in 1: Nhost.sp) 
+  {
+    for (j in 1:Npar) 
+    {  
+      use[n, j] ~ dbern(p[n, j])  
+      
+      logit(p[n, j]) <- alpha[n, j] + alpha_d*domestic[n] 
+      alpha[n, j] ~ dnorm(mn[1], prec[1]) 
+      
+      beta[n,j] ~ dnorm(sp.beta[j],prec.beta)
+    }
+    PD_host[n]<- sum (use[n, ]) 
+  } 
+  
+  
+  for (j in 1: Npar)  
+  {        
+    sp.beta[j] ~ dnorm(mn[2], prec[2]) 
+    HB_invert[j] <- sum(use[, j]) 
+  }
+
+  beta_t ~ dnorm(0, 0.0001)
+  r~dgamma(0.1,0.1)
+
+  mn[1] ~ dnorm(0, .02)T(-8,8) 
+  mn[2] ~ dnorm(0, .0001) 
+
+  sd[1] ~ dt(0, 1, 1)T(0,12) 
+  sd[2] ~ dt(0, .016, 1)T(0, ) 
+
+  alpha_d ~ dnorm(0, .0001)
+
+  prec.beta <- pow(sdb,-2)
+  sdb ~ dt(0, .016, 1)T(0, ) 
+
+  for (k in 1:2) 
+  { 
+    prec[k] <- pow(sd[k], -2)    
+  }
+
+  #hosts <- use[,] %*% t(use[,])
+  #parasites <- t(use[,]) %*% use[,]
+} 

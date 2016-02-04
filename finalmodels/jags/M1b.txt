@@ -1,0 +1,38 @@
+      model 
+{    
+  for (i in 1:Nobs)  #for all observations run loop around 
+  { 
+    count[i] ~ dpois(mu[i])  #the count data with a Poission distribution (0, 1)
+    mu[i] <- lambda[i] * use[host.sp[i], par.sp[i]]  #mean abundance = characteristic abundance of each insect sp. * use of the pl.sp. k that indiv. i belongs to 
+    log(lambda[i]) <- beta[par.sp[i]]      # characteristic abundance of inv.sp. j on pl.ind. i (NOTE: insect has the same abundance on all plant species)
+  }   
+  
+  for (n in 1: Nhost.sp) #loop around all plant species, calculate use, alpha and insect diversity
+  {
+    for (j in 1:Npar) #loop around all insect species
+    {  
+      use[n, j] ~ dbern(p[n, j])  # probability of use drawn from a Bernoullli distribution 
+      logit(p[n, j]) <- alpha[n, par.fam[j]] # p is pi, logit is link function of Bernoulli distribution
+    }
+    for (k in 1:Npar.fam) {
+      alpha[n, k] ~ dnorm(mn[1], prec[1]) # coefficient for use is drawn from normal distribution with mean and precision)
+    }
+    
+    PD_host[n]<- sum (use[n, ]) #Insect diversity = sum of the uses for each plant species
+  } 
+  
+  # priors?   
+  for (j in 1: Npar)  #loop around insect species, calculate charact abundance and host breadth
+  {        
+    beta[j] ~ dnorm(mn[2], prec[2]) # average abundance across all invertebrate sp. beta0 and a random effect coeff. beta1
+    HB_invert[j] <- sum(use[, j]) #
+  } 
+  
+  for (k in 1:2) # 
+  { 
+    mn[k] ~ dnorm(0, .0001) 
+    prec[k] <- pow(sd[k], -2)
+    sd[k] ~ dt(0, .016, 1)T(0, ) # a half-cauchy is apparently the t-distribution with 1 degree of freedom. 
+    #sd[k] ~ dunif(0, 100)
+  }
+} 

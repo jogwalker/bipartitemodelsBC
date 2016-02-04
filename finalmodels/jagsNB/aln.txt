@@ -1,0 +1,49 @@
+      model 
+  {    
+  for (i in 1:Nobs) { #for all observations run loop around 
+    count[i] ~ dnegbin(Pp[i], r)  #Poisson count data
+    Pp[i] <- r/(r+mu.eff[i]) 
+ mu.eff[i] <- lambda[i]* use[host.sp[i], par.sp[i]]  #mean abundance = abundance of each plant sp. * use of the pl.sp. k that indiv. i belongs to 
+    log(lambda[i]) <- beta[par.sp[i]]  + beta_pr*rain[ind[i]] + beta_t*treated[ind[i]] # mean abundance of inv.sp. j on pl.ind. i
+  }  
+  
+  for (n in 1: Nhost.sp) { #loop around all host species, calculate use, alpha and insect diversity
+    
+    for (j in 1:Npar) {  
+      use[n, j] ~ dbern(p[n, j])  # probability of use drawn from a Bernoullli distribution 
+      logit(p[n, j]) <- alpha[n, par.gen[j]] # refers to the identity list which names the category for each 
+    }
+    
+    for (k in 1:Npar.gen) { # loop around parasite Genera
+      alpha[n, k] ~ dnorm(mn[1], prec[1]) 
+    }
+    
+    PD_host[n]<- sum (use[n, ]) #sums up the use values for each host species
+  } 
+
+   #Specify priors for missing data.
+  for(i in 1:length(missing.ind.rain)) {
+    rain[missing.ind.rain[i]] ~ dnorm(0,1)T(-1.738577, )
+  } 
+
+  for(i in 1:length(missing.ind.treat)) {
+    treated[missing.ind.treat[i]] ~ dbern(0.5)
+  } 
+  
+  for (j in 1: Npar) {  #loop around parasite species, calculate charact abundance and host breadth        
+    beta[j] ~ dnorm(mn[2], prec[2]) # average abundance across all invertebrate sp. beta0 and a random effect coeff. beta1
+    HB_invert[j] <- sum(use[, j]) #how many hosts the parasite uses
+  } 
+
+  beta_pr ~ dnorm(0, 0.0001)
+  beta_t ~ dnorm(0, 0.0001)
+  
+  r~dgamma(0.1,0.1) 
+ for (k in 1:2) # 
+  { 
+    mn[k] ~ dnorm(0, .0001) # mean, precision
+    prec[k] <- pow(sd[k], -2)
+    sd[k] ~ dt(0, .016, 1)T(0, ) # a half-cauchy is apparently the t-distribution with 1 degree of freedom. 
+    #sd[k] ~ dunif(0, 100)
+  }
+} 

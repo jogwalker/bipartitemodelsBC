@@ -1,0 +1,17 @@
+Host.Species,Scientific.Name,Domestic,Ruminant,Feeder,Genus
+Blue_wildebeest,Connochaetes taurinus,FALSE,TRUE,Grazer,Connochaetes
+Bushbuck,Tragelaphus scriptus,FALSE,TRUE,Browser,Tragelaphus
+Cape_buffalo,Syncerus caffer,FALSE,TRUE,Grazer,Syncerus
+Cattle,Bos taurus (indicus),TRUE,TRUE,Grazer,Bos
+Common_duiker,Sylvicapra grimmia,FALSE,TRUE,Browser,Sylvicapra
+Donkey,Equus africanus asinus,TRUE,FALSE,Grazer,Equus
+Gemsbok,Oryx gazella,FALSE,TRUE,Grazer,Oryx
+Giraffe,Giraffa camelopardalis,FALSE,TRUE,Browser,Giraffa
+Greater_kudu,Tragelaphus strepsiceros,FALSE,TRUE,Browser,Tragelaphus
+Horse,Equus ferus caballus,TRUE,FALSE,Grazer,Equus
+Impala,Aepyceros melampus,FALSE,TRUE,Mixed feeder,Aepyceros
+Red_hartebeest,Alcelaphus buselaphus,FALSE,TRUE,Grazer,Alcelaphus
+Sheep,Ovis aries,TRUE,TRUE,Grazer,Ovis
+Springbok,Antidorcas marsupialis,FALSE,TRUE,Mixed feeder,Antidorcas
+Steenbok,Raphicerus campestris,FALSE,TRUE,Mixed feeder,Raphicerus
+Zebra_Burchell,Equus quagga burchellii,FALSE,FALSE,Grazer,Equus

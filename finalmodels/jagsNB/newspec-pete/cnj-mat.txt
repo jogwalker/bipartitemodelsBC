@@ -1,0 +1,48 @@
+      model
+{    
+  for (i in 1:Nobs)  #for all observations run loop around 
+  { 
+    count[i] ~ dnegbin(Pp[i], r)  #the count data with a Poission distribution (0, 1)
+    Pp[i] <- r/(r+mu.eff[i]) 
+ mu.eff[i] <- lambda[i]* use[host.sp[i], par.sp[i]]  #mean abundance = characteristic abundance of each insect sp. * use of the pl.sp. k that indiv. i belongs to 
+    log(lambda[i]) <- beta[host.sp[i],par.sp[i]] + beta_t*treated[ind[i]]     # characteristic abundance of inv.sp. j on pl.ind. i (NOTE: insect has the same abundance on all plant species)
+  }   
+  
+  for (n in 1: Nhost.sp) #loop around all plant species, calculate use, alpha and insect diversity
+  {
+    for (j in 1:Npar) #loop around all insect species
+    {  
+      use[n, j] ~ dbern(p[n, j])  # probability of use drawn from a Bernoullli distribution 
+      p[n,j] <- mn_p + alpha_d*domestic[n]
+      
+      #logit(p[n, j]) <- alpha[n, j] + alpha_d*domestic[n] # p is pi, logit is link function of Bernoulli distribution
+      #alpha[n, j] ~ dnorm(mn[1], prec[1]) # coefficient for use is drawn from normal distribution with mean and precision)
+      
+      beta[n,j] ~ dnorm(sp.beta[j],prec.beta)
+    }
+    PD_host[n]<- sum (use[n, ]) #Insect diversity = sum of the uses for each plant species
+  } 
+  mn_p ~ dbeta(.5,.5) 
+  # priors?   
+  for (j in 1: Npar)  #loop around insect species, calculate charact abundance and host breadth
+  {        
+    sp.beta[j] ~ dnorm(mn[2], prec[2]) # average abundance across all invertebrate sp. beta0 and a random effect coeff. beta1
+    HB_invert[j] <- sum(use[, j]) #
+  } 
+  beta_t ~ dnorm(0, 0.0001)
+  r~dgamma(0.1,0.1) 
+ for (k in 1:2) # 
+  { 
+    mn[k] ~ dnorm(0, .0001) 
+    prec[k] <- pow(sd[k], -2)
+    sd[k] ~ dt(0, .016, 1)T(0, ) # a half-cauchy is apparently the t-distribution with 1 degree of freedom. 
+    #sd[k] ~ dunif(0, 100)
+  }
+  alpha_d ~ dnorm(0, .0001)
+  prec.beta <- pow(sdb,-2)
+  sdb ~ dt(0, .016, 1)T(0, ) # a half-cauchy is apparently the t-distribution with 1 degree of freedom. 
+
+# calculate host-host network
+  hosts <- use[,] %*% t(use[,])
+  parasites <- t(use[,]) %*% use[,]
+} 
