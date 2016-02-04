@@ -13,7 +13,7 @@
   {
     for (j in 1:Npar) 
     {  
-      use[n, j] ~ dbeta(a1[n,j],a2[n,j])T(0.0001,0.9999)
+      use[n, j] ~ dbeta(a1[n,j],a2[n,j]) #T(0.0001,0.9999)
       a1[n,j] <- mu[n,j]*phi
       a2[n,j] <- (1-mu[n,j])*phi
 
@@ -41,6 +41,6 @@
   { 
     mn[k] ~ dnorm(0, .0001) 
     prec[k] <- pow(sd[k], -2)
-    sd[k] ~ dt(0, .016, 1)T(0, )  
+    sd[k] ~ dt(0, .04, 1)T(0, ) #half cauchy as Gelman 2006  
   }
 } 
