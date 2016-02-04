@@ -1,0 +1,48 @@
+      model 
+{    
+  for (i in 1:Nobs)  
+  { 
+    count[i] ~ dnegbin(Pp[i], r)  
+    Pp[i] <- r/(r+mu.eff[i]) 
+ mu.eff[i] <- lambda[i]* use[host.sp[i], par.sp[i]]  
+    log(lambda[i]) <- beta[par.sp[i]]      
+  }   
+  
+  for (n in 1: Nhost.sp) 
+  {
+    for (j in 1:Npar) 
+    {  
+      use[n, j] ~ dbeta(a1[n,j],a2[n,j])T(0.0001,0.9999)
+      a1[n,j] <- mu[n,j]*phi
+      a2[n,j] <- (1-mu[n,j])*phi
+
+      logit(mu[n,j]) <- alpha[n,j] + alpha_b*browser[n] + alpha_m*mixed[n]
+
+      alpha[n, j] ~ dnorm(mn[1], prec[1]) 
+    }
+    PD_host[n]<- sum (use[n, ]) 
+  } 
+  
+  
+  for (j in 1: Npar)  
+  {        
+    beta[j] ~ dnorm(mn[2], prec[2]) 
+    HB_invert[j] <- sum(use[, j]) #
+  } 
+  
+  # prior for phi - beta dist precision parameter inverse gamma
+  phi <- 1/phiinv
+  phiinv ~ dgamma(0.1,0.1)
+
+  
+  r~dgamma(0.1,0.1) 
+ for (k in 1:2) # 
+  { 
+    mn[k] ~ dnorm(0, .0001) 
+    prec[k] <- pow(sd[k], -2)
+    sd[k] ~ dt(0, .04, 1)T(0, ) 
+  }
+
+  alpha_b ~ dnorm(0,0.0001)
+  alpha_m ~ dnorm(0,0.0001)
+} 
