@@ -41,7 +41,7 @@ inits <- function() {
     sd=c(3,1.5),
     alpha=matrix(rnorm(long$Npar*long$Nhost.sp,mean=-5),ncol=long$Npar,byrow=T),
     beta=rnorm(long$Npar),
-    use=matrix(rep(1,long$Npar*long$Nhost.sp),ncol=long$Npar,byrow=T)
+    use=matrix(rep(0.9,long$Npar*long$Nhost.sp),ncol=long$Npar,byrow=T)
   )
 }
 
