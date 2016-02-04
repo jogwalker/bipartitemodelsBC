@@ -1,23 +1,26 @@
       model 
 {    
-  for (i in 1:Nobs)  #for all observations run loop around 
+  for (i in 1:Nobs)   
   { 
-    count[i] ~ dnegbin(Pp[i], r)  #the count data with a Poission distribution (0, 1)
+    count[i] ~ dnegbin(Pp[i], r)  
     Pp[i] <- r/(r+mu.eff[i]) 
- mu.eff[i] <- lambda[i]* use[host.sp[i], par.sp[i]]  #mean abundance = characteristic abundance of each insect sp. * use of the pl.sp. k that indiv. i belongs to 
-    log(lambda[i]) <- beta[par.sp[i]]      # characteristic abundance of inv.sp. j on pl.ind. i (NOTE: insect has the same abundance on all plant species)
+ mu.eff[i] <- lambda[i]* use[host.sp[i], par.sp[i]]  
+    log(lambda[i]) <- beta[par.sp[i]]      
   }   
   
-  for (n in 1: Nhost.sp) #loop around all plant species, calculate use, alpha and insect diversity
+  for (n in 1: Nhost.sp) 
   {
-    for (j in 1:Npar) #loop around all insect species
+    for (j in 1:Npar) 
     {  
-      use[n, j] ~ dbern(p[n, j])  # probability of use drawn from a Bernoullli distribution 
-      logit(p[n, j]) <- alpha[n, j] + alpha_gen[hostgen[n]]# p is pi, logit is link function of Bernoulli distribution
-      alpha[n, j] ~ dnorm(mn[1], prec[1]) # coefficient for use is drawn from normal distribution with mean and precision)
+      use[n, j] ~ dbeta(a1[n,j],a2[n,j])T(0.00001,0.99999)
+      a1[n,j] <- mu[n,j]*phi
+      a2[n,j] <- (1-mu[n,j])*phi
+
+      logit(mu[n,j]) <- alpha[n,j] + alpha_gen[hostgen[n]]
+      alpha[n, j] ~ dnorm(mn[1], prec[1]) 
     }
     
-    PD_host[n]<- sum (use[n, ]) #Insect diversity = sum of the uses for each plant species
+    PD_host[n]<- sum (use[n, ]) 
   } 
   
   for(k in 1:ngen) {
@@ -25,18 +28,19 @@
   }
   
   # priors?   
-  for (j in 1: Npar)  #loop around insect species, calculate charact abundance and host breadth
+  for (j in 1: Npar)  
   {        
-    beta[j] ~ dnorm(mn[2], prec[2]) # average abundance across all invertebrate sp. beta0 and a random effect coeff. beta1
+    beta[j] ~ dnorm(mn[2], prec[2]) 
     HB_invert[j] <- sum(use[, j]) #
   } 
-  
+    # prior for phi - beta dist precision parameter inverse gamma
+  phi <- 1/phiinv
+  phiinv ~ dgamma(0.1,0.1)
   r~dgamma(0.1,0.1) 
  for (k in 1:3) # 
   { 
     mn[k] ~ dnorm(0, .0001) 
     prec[k] <- pow(sd[k], -2)
-    sd[k] ~ dt(0, .016, 1)T(0, ) # a half-cauchy is apparently the t-distribution with 1 degree of freedom. 
-    #sd[k] ~ dunif(0, 100)
+    sd[k] ~ dt(0, .04, 1)T(0, ) 
   }
 } 
