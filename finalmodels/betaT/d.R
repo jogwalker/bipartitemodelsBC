@@ -14,7 +14,7 @@ library(reshape2) #attach the reshape package for function "melt()"
 library(R2jags)
 library(rjags)
 
-set.seed(3)
+set.seed(5)
 
 load("~/bipartitemodelsBC/data/finaldata.RData")
 #all(collec.lng$ID[1:nrow(covars)] == covars$newID)
