@@ -59,7 +59,7 @@ inits <- function() {
 
 
 ## Run model
-output  <- jags(long, inits = inits, c('mn', 'sd', 'use','mu','phi'), modelfile, n.chains=3, n.iter=iter,n.burnin=burnin,n.thin=thin) # or use defaults
+output  <- jags(long, inits = inits, c('mn', 'sd', 'use','mu','phi','beta_pr'), modelfile, n.chains=3, n.iter=iter,n.burnin=burnin,n.thin=thin) # or use defaults
 
 save(output, file = paste(outdir,"/M1loutput",iter,".RData",sep=""))
 

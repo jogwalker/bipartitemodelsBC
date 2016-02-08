@@ -6,7 +6,7 @@
 #PBS -l walltime=72:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -S /bin/bash
-#PBS -t 16
+#PBS -t 11
 
 if [ -n "${1}" ]; then
   echo "${1}"
@@ -15,9 +15,9 @@ fi
 
 filepath="$HOME/bipartitemodelsBC/finalmodels/beta"
 outdir="~/bipartitemodelsBC/results/beta"
-iter=55000
+iter=105000
 burnin=5000
-thin=50
+thin=100
 
 ls -1 ${filepath}
 
