@@ -1,0 +1,79 @@
+#### RUN MODEL with superfamily as predictor for alpha (for BC): Model 4
+
+## Set up output files
+arguments <- commandArgs(T)
+outdir <- arguments[1]
+iter <- as.numeric(arguments[2])
+burnin <- as.numeric(arguments[3])
+thin <- as.numeric(arguments[4])
+
+## load packages
+library(R2jags)
+library(rjags)
+
+set.seed(3)
+
+## read and format data
+load("~/bipartitemodelsBC/data/finaldata.RData")
+collec.lng$ID <- NULL
+
+covars <- read.csv('~/bipartitemodelsBC/data/parasitelevel.csv', head=T)
+covars <- covars[with(covars,order(Binomial)),]
+
+str(collec.lng)
+long <- as.list(collec.lng)  
+long$count <- as.integer(long$count)
+long$Nobs <- length(long$count)
+long$Nhost.sp <- length(unique(long$host.sp))
+long$Npar <- length(unique(long$par.sp))
+long$par.sp <- as.factor(as.character(long$par.sp))
+long$par.fam <- covars$Superfamily
+long$Npar.fam <- length(unique(long$par.fam))
+
+save(long,file=paste(outdir,"/M1blong",iter,".RData",sep=""))
+
+## Define model
+
+
+modelfile <- "~/bipartitemodelsBC/finalmodels/jagsNB/beta/M1b.txt"        
+
+
+## Define initial values
+
+inits <- function() {
+  list(
+    mn=c(0.5,-5), 
+    sd=c(3,1.5),
+    alpha=matrix(rnorm(long$Npar.fam*long$Nhost.sp,mean=-5),ncol=long$Npar.fam,byrow=T),
+    beta=rnorm(long$Npar),
+    use=matrix(rep(0.9,long$Npar*long$Nhost.sp),ncol=long$Npar,byrow=T)
+  )
+}
+
+
+## Run model
+output  <- jags(long, inits = inits, c('mn', 'sd', 'use', 'phi','beta','alpha','r','HB_invert','PD_host','hosts'), modelfile, n.chains=3, n.iter=iter,n.burnin=burnin,n.thin=thin) # or use defaults
+
+save(output, file = paste(outdir,"/M1boutput",iter,".RData",sep=""))
+
+
+# calculate convergence
+library(jagstools)
+library(dplyr)
+
+notconv <- rhats(output) %>% subset(. >= 1.1) %>% length()
+params <- length(rhats(output))
+
+
+options(max.print=100000)
+sink(file=paste(outdir,"/M1bprintoutput",iter,".txt",sep=""))
+paste("not converged =", notconv, sep=" ")
+paste("total params =", params, sep=" ")
+print("which not converged: ")
+rhats(output) %>% subset(. >= 1.1)
+print(output)
+sink()
+
+
+
+
