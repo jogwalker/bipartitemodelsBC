@@ -15,9 +15,9 @@ fi
 
 filepath="$HOME/bipartitemodelsBC/finalmodels/betaT"
 outdir="~/bipartitemodelsBC/results/betaT"
-iter=105000
+iter=55000
 burnin=5000
-thin=100
+thin=50
 
 ls -1 ${filepath}
 
