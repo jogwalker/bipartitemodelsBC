@@ -41,7 +41,7 @@ save(long,file=paste(outdir,"/M1llong",iter,".RData",sep=""))
 ## Define model
 
 
-modelfile <- "~/bipartitemodelsBC/finalmodels/jagsNB/beta/m1l.txt"   
+modelfile <- "~/bipartitemodelsBC/finalmodels/jagsNB/betaFull/m1l.txt"   
 
 
 ## Define initial values
