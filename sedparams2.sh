@@ -16,6 +16,6 @@ done < <(ls -1 ${filepath})
 
 for j in "${array[@]}"
 do
-	sed -e 's/'mu'/'beta\',\'alpha\',\'r\',\'HB_invert\',\'PD_host\',\'hosts'/' < ${filepath}/${j} > ${outdir}/${j}
+	sed -e 's/'mu'/'beta\',\'alpha\',\'r\',\'HB_invert\',\'PD_host\',\'hosts'/' -e 's/\/beta\//\/betaFull\//' < ${filepath}/${j} > ${outdir}/${j}
 done
 
