@@ -47,5 +47,6 @@
     prec[k] <- pow(sd[k], -2)
     sd[k] ~ dt(0, .04, 1)T(0, ) 
   }
+  hosts <- use[,] %*% t(use[,])
 
 } 

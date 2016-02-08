@@ -47,5 +47,5 @@
   }
   prec.beta <- pow(sdb,-2)
   sdb ~ dt(0, .04, 1)T(0, ) 
-  
+  hosts <- use[,] %*% t(use[,])
 } 

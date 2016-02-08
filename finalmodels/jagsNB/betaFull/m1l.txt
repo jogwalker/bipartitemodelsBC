@@ -50,4 +50,5 @@
     prec[k] <- pow(sd[k], -2)
     sd[k] ~ dt(0, .04, 1)T(0, ) #half cauchy as Gelman 2006  
   }
+  hosts <- use[,] %*% t(use[,])
 } 
