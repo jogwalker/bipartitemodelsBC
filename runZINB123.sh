@@ -6,7 +6,7 @@
 #PBS -l walltime=72:00:00
 #PBS -l nodes=1:ppn=1
 #PBS -S /bin/bash
-#PBS -t 1-17
+#PBS -t 10
 
 if [ -n "${1}" ]; then
   echo "${1}"

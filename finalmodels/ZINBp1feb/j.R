@@ -25,7 +25,7 @@ long$Nobs <- length(long$count)
 long$Nhost.sp <- length(unique(long$host.sp))
 long$Npar <- length(unique(long$par.sp))
 long$par.sp <- as.factor(as.character(long$par.sp))
-long$hostspchar <- as.numeric(covars$Domestic)
+long$hostspchar <- as.numeric(covars$Wild)
 
 save(long,file=paste(outdir,"/M1jlong.RData",sep=""))
 
