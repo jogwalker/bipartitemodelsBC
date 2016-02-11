@@ -15,7 +15,7 @@ library(rjags)
 load("~/bipartitemodelsBC/data/finaldata.RData")
 collec.lng$ID <- NULL
 
-covars <- read.csv('~/bipartitemodelsBC/data/hostlevel.csv', head=T)
+covars <- read.csv('~/bipartitemodelsBC/data/hostlevel-switchwild.csv', head=T)
 covars <- covars[with(covars,order(as.character(Host.Species))),]
 
 str(collec.lng)
