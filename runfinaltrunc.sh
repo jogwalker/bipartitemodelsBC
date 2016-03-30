@@ -9,5 +9,7 @@
 
 outdir="~/bipartitemodelsBC/results/finaltrunc"
 runlength=300000
+burn=75000
+thin=50
 
-R --no-save --args ${outdir} ${runlength} < "$HOME/bipartitemodelsBC/finalmodels/finaltrunc.R"
+R --no-save --args ${outdir} ${runlength} ${burn} ${thin} < "$HOME/bipartitemodelsBC/finalmodels/finaltrunc-march.R"
