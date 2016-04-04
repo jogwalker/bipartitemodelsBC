@@ -17,7 +17,8 @@ library(rjags)
 ## load model file
 load("~/bipartitemodelsBC/results/finaltrunc/cnj_output-trunc3e+05.RData")
 recompile(output)
-
+# add dic module because failed at end last time (4 April)
+load.module("dic")
 ## update model
 new.output <- update(output,n.iter=iter,n.thin=thin,progress.bar="none")
 
