@@ -22,7 +22,7 @@ load.module("dic")
 ## update model
 new.output <- update(output,n.iter=iter,n.thin=thin,progress.bar="none")
 
-save(new.output,file=paste(outdir,"/cnj_output-trunc3e+05-update.RData")
+save(new.output,file=paste(outdir,"/cnj_output-trunc3e+05-update.RData",sep=""))
 
 # calculate convergence
 library(jagstools)
