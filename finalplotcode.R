@@ -1,22 +1,24 @@
 # final plot code ch3
+# update for new laptop 29 April 2016
 
-#15 feb experiment with 300k run  to see how different it is, but don't change thesis.
-load("~/Documents/bipartitemodelsBC/results/cnj_output-trunc1e+05.RData")
-#load("~/Documents/bipartitemodelsBC/results/cnj_output-trunc3e+05.RData")
-setwd("~/Documents/ch3 stuff")
+#load data from updated run
+#load("~/dat/bipartitemodelsBC/cnj_output-trunc3e+05-update.RData")
+load("~/dat/bipartitemodelsBC/march-cnj_output-trunc3e+05.RData")
 
 library(coda,quietly=TRUE,verbose=FALSE)
 library(R2jags,quietly=TRUE,verbose=FALSE,warn.conflicts=FALSE)
 
-#par(mfrow =c(2,2))
-pdf("finalplots/trace300k.pdf",height=10)
-#traceplot(output, mfrow =c(2,2), varname = c('mn', 'sd'), ask = FALSE)
-#traceplot(output,mfrow=c(2,2),varname=c('alpha_d','beta_t','r','deviance'),ask=FALSE)
+# pdf("~/dat/bipartitemodelsBC/figs/trace-update.pdf",height=10)
+# traceplot(new.output,mfrow=c(4,2),varname=c('mn', 'sd','alpha_d','beta_t','r','deviance'),ask=FALSE)
+# dev.off()
+
+pdf("~/dat/bipartitemodelsBC/figs/trace-300k-long.pdf",height=10)
 traceplot(output,mfrow=c(4,2),varname=c('mn', 'sd','alpha_d','beta_t','r','deviance'),ask=FALSE)
 dev.off()
 
+
 attach.jags(output)
-pdf("finalplots/density.pdf",height=10)
+pdf("~/dat/bipartitemodelsBC/figs/density.pdf",height=10)
 par(mfrow = c(4,2))
 plot(density(mn[,1]),main="mn[1]")
 plot(density(mn[,2]),main="mn[2]")
@@ -29,15 +31,13 @@ plot(density(deviance),main="deviance")
 dev.off()
 
 
-load("~/Documents/bipartitemodelsBC/data/finaldata.RData")
+load("~/git/bipartitemodelsBC/data/finaldata.RData")
+load("~/dat/bipartitemodelsBC/march-cnjlong-trunc3e+05.RData")
 
 library(dplyr,quietly=TRUE,verbose=FALSE,warn.conflicts=FALSE)
 library(tidyr,quietly=TRUE,verbose=FALSE,warn.conflicts=FALSE)
 library(reshape2,quietly=TRUE,verbose=FALSE,warn.conflicts=FALSE)
 
-#load("C:/Users/jw12513/Google Drive/Thesis/Chapter 3 (Community Ecology)/bipartitemodelsBC/results/newprior/cnjlong.RData")
-#load("~/Documents/bipartitemodelsBC/results/cnjlong-trunc1e+05.RData")
-load("~/Documents/bipartitemodelsBC/data/finaldata.RData")
 
 # observed prevalence
 agg <- collec.lng %>% group_by(host.sp,par.sp) %>% summarize(nhost=length(unique(ID)),totalcount=sum(count),npos=sum(as.numeric(count>0)))
@@ -64,7 +64,7 @@ prob.use[is.na(prob.use)] <- 0
 # hist(inv.logit((alpha[,16,60])))
 plot(prob.use$use ~ prob.use$prev)
 library(ggplot2)
-pdf("finalplots/probuse-rotate.pdf",height=4)
+pdf("~/dat/bipartitemodelsBC/figs/probuse-rotate.pdf",height=4)
 ggplot(data=prob.use,aes(y=prev,x=use)) + geom_point() + theme_bw() + ylab("Mean estimate for use") + xlab("Observed prevalence") 
 dev.off()
 
@@ -96,7 +96,7 @@ plot(abund$beta ~ log(abund$meancount+0.5))
 abund$logcount <- ifelse(abund$meancount==0,log(abund$meancount+1),log(abund$meancount))
 abund$log <- ifelse(abund$meancount==0,TRUE,FALSE)
 
-pdf("finalplots/abund-rotate.pdf",height=4)
+pdf("~/dat/bipartitemodelsBC/figs/abund-rotate.pdf",height=4)
 ggplot(data=abund,aes(y=logcount,x=beta,colour=log)) + theme_bw() + ylab("Log predicted mean abundance") +xlab("Log observed mean count") + geom_point() + theme(legend.position="none")
 dev.off()
 
@@ -129,14 +129,14 @@ expabundsort2$par.sp <- with(expabundsort2,factor(par.sp,levels = rev(unique(as.
 
 
 base_size <- 12
-pdf("finalplots/abundheatmap-sort-sp.pdf",height=12)
+pdf("~/dat/bipartitemodelsBC/figs/abundheatmap-sort-sp.pdf",height=12)
 ggplot(expabundsort2, aes(host.sp,par.sp)) + geom_tile(aes(fill = beta), colour = "white") + scale_fill_gradient(low = "white", high = "black") + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) + theme(legend.position = "none", axis.ticks = element_blank(), axis.text.x = element_text(size = base_size * 0.8, angle = 270, hjust = 0, colour = "grey50"),axis.text.y=element_text(size=base_size*0.7))
 dev.off()
 
 
 
-base_size <- 12
-pdf("finalplots/abundheatmap-abbrev-tall2.pdf",height=12)
+#base_size <- 12
+pdf("~/dat/bipartitemodelsBC/figs/abundheatmap-abbrev-tall2.pdf",height=12)
 ggplot(expabund, aes(host.sp2,par.sp3)) + geom_tile(aes(fill = beta), colour = "white") + scale_fill_gradient(low = "white", high = "black") + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) + theme(legend.position = "none", axis.ticks = element_blank(), axis.text.x = element_text(size = base_size * 0.8, angle = 270, hjust = 0, colour = "grey50"),axis.text.y=element_text(size=base_size*0.7))
 dev.off()
 
@@ -160,7 +160,7 @@ prob.use2$par.sp3 <- gsub("[a-z]*_",". ",prob.use2$par.sp)
 # names(prob.use3)<-c( 'host.sp', 'par.sp', 'use')
 
 
-pdf("finalplots/useheatmap-tall.pdf",height=12)
+pdf("~/dat/bipartitemodelsBC/figs/useheatmap-tall.pdf",height=12)
 ggplot(prob.use2, aes(host.sp2,par.sp3)) + geom_tile(aes(fill = use), colour = "white") + scale_fill_gradient(low = "white", high = "black") + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) + theme(legend.position = "none", axis.ticks = element_blank(), axis.text.x = element_text(size = base_size * 0.8, angle = 270, hjust = 0, colour = "grey50"),axis.text.y=element_text(size=base_size*0.7,vjust=0.25))
 dev.off()
 
@@ -177,28 +177,30 @@ probusesort2 <- probusesort2[order(probusesort2$parsum,probusesort2$hostsum,decr
 probusesort2$host.sp <- with(probusesort2,factor(host.sp,levels = rev(unique(as.character(host.sp)))))
 probusesort2$par.sp <- with(probusesort2,factor(par.sp,levels = (unique(as.character(par.sp)))))
 
-pdf("finalplots/useheatmap-sort2.pdf",height=12)
+pdf("~/dat/bipartitemodelsBC/figs/useheatmap-sort2.pdf",height=12)
 ggplot(probusesort2, aes(host.sp,par.sp)) + geom_tile(aes(fill = use), colour = "white") + scale_fill_gradient(low = "white", high = "black") + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) + theme(legend.position = "none", axis.ticks = element_blank(), axis.text.x = element_text(size = base_size * 0.8, angle = 270, hjust = 0, colour = "grey50"),axis.text.y=element_text(size=base_size*0.7,vjust=0.25))
 
 dev.off()
 
 prob.use$presence <- ifelse(prob.use$prev > 0, 1,0)
 hostuse <- prob.use %>% group_by(host.sp) %>% summarize(degree=sum(presence))
+# https://johnbaumgartner.wordpress.com/2012/06/07/r-functions-to-filter-rjags-results/
 library(jagstools)
 ID<-as.data.frame(jagsresults(output, params='PD_host'))
 names(ID)<-c("mean","sd","q2.5","q25","q50","q75","q97.5","Rhat","n.eff")
 row.names(ID)<-levels(long$host.sp)
 ID$degree <- hostuse$degree
 ID<-ID[order(ID[,1]),]
+ID$species <- gsub("_"," " ,row.names(ID))
 
-pdf("finalplots/host-pardiv.pdf")
+pdf("~/dat/bipartitemodelsBC/figs/host-pardiv.pdf")
 par(oma=c(4, 11, 0, 1), mar=c(0, 0.3, 2, 0), bg ='white') # try changing all margins to 0??
 plot.new()
 with(ID[1:nrow(ID),], {
   plot.window(xlim = range(c(ID$q2.5,ID$q97.5)), ylim =range(c(1, nrow(ID))))
   box()
   axis(1)
-  axis(2, at=1:nrow(ID), las=2, labels=row.names(ID),cex.axis=1, tck =0.0)
+  axis(2, at=1:nrow(ID), las=2, labels=ID$species,cex.axis=1, tck =0.0)
   # title(main = "Insect diversity", line=1)
   title(xlab= "Parasite diversity", outer=TRUE)
   segments(x0=ID$q2.5, y0=c(1:nrow(ID)), x1=ID$q97.5, y1=c(1:nrow(ID)), lty=1, lwd=2.5)
@@ -218,15 +220,16 @@ row.names(HB)<-levels(long$par.sp)
 HB$species <- row.names(HB)
 HB <- merge(HB,paruse,by.x="species",by.y="par.sp",all=TRUE)
 HB<-HB[order(HB[,"mean"]),]
+HB$species2 <- gsub("_"," " ,HB$species)
 
-pdf("finalplots/par-hostbr.pdf",height=10)
+pdf("~/dat/bipartitemodelsBC/figs/par-hostbr.pdf",height=10)
 par(oma=c(4, 11, 0, 1), mar=c(0, 0.3, 2, 0))
 plot.new()
 with(HB[1:nrow(HB),], {
   plot.window(xlim = range(c(HB$q2.5,HB$q97.5)), ylim =range(c(1, nrow(HB))))
   box()
   axis(1, at=c(0:10), labels= c(0:10), )
-  axis(2, at=1:nrow(HB), labels=HB$species, las=1, cex.axis=0.7, tck =0.0)
+  axis(2, at=1:nrow(HB), labels=HB$species2, las=1, cex.axis=0.7, tck =0.0)
   #axis(2, at = 20, labels="Insect species", las=3, cex.axis=1, tck =0.0)
   #title(main = "Host Breadth", line=1)
   title(xlab= "Number of hosts", outer=TRUE)
@@ -384,12 +387,16 @@ communities(fc0)
 fc0
 communities(fc3)
 fc3
+communities(fc1)
+fc1
+communities(fc2)
+fc2
 # com<-community.to.membership(g0, fc$merges, steps= which.max(fc$modularity)-1)
 # V(g)$color <- com$membership+1
 # g$layout <- layout.fruchterman.reingold
 # plot(g, vertex.label=NA)
 
-pdf("finalplots/networks2.pdf",height=10,width=10)
+pdf("~/dat/bipartitemodelsBC/figs/networks2.pdf",height=10,width=10)
 par(mfrow=c(2,2),oma=c(0,0,0,0),mar=c(0,0,2,0))
 # plot.igraph(g0,layout=layout.fruchterman.reingold, edge.color="grey",edge.width=E(g0)$weight,main="Observed")
 # plot.igraph(g1,layout=layout.fruchterman.reingold, edge.color="grey",edge.width=E(g1)$weight,main="Lower bound")
@@ -410,7 +417,7 @@ V(g2)$color <- membership(fc2)
 V(g3)$color <- membership(fc3)
 
 
-pdf("finalplots/networks3.pdf",height=10,width=10)
+pdf("~/dat/bipartitemodelsBC/figs/networks3.pdf",height=10,width=10)
 par(mfrow=c(2,2),oma=c(0,0,0,0),mar=c(0,0,2,0))
 plot.igraph(g0,layout=layout.circle(g0), edge.color="grey",edge.width=E(g0)$weight,main="Observed")
 plot.igraph(g1,layout=layout.circle(g1), edge.color="grey",edge.width=E(g1)$weight,main="Lower bound")
