@@ -222,7 +222,7 @@ HB <- merge(HB,paruse,by.x="species",by.y="par.sp",all=TRUE)
 HB<-HB[order(HB[,"mean"]),]
 HB$species2 <- gsub("_"," " ,HB$species)
 
-pdf("~/dat/bipartitemodelsBC/figs/par-hostbr.pdf",height=10)
+pdf("~/dat/bipartitemodelsBC/figs/par-hostbr.pdf",height=11)
 par(oma=c(4, 11, 0, 1), mar=c(0, 0.3, 2, 0))
 plot.new()
 with(HB[1:nrow(HB),], {
