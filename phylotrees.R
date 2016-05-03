@@ -1,9 +1,10 @@
 # try to make a mammal phylogeny
-setwd("~/Documents/ch3 stuff")
+#setwd("~/Documents/ch3 stuff")
+# update 3 May 2016
 
 library(ape)
 
-tree <- read.tree("TimetreeOfLife2015.nwk")
+tree <- read.tree("~/dat/bipartitemodelsBC/TimetreeOfLife2015.nwk")
 
 species <- c("Connochaetes_taurinus",
              "Tragelaphus_scriptus",
@@ -35,8 +36,7 @@ write.tree(pruned.tree)
 
 
 ########
-setwd("~/Documents/ch3 stuff")
-times <- read.csv("time distance.csv",head=T)
+times <- read.csv("~/dat/bipartitemodelsBC/time distance.csv",head=T)
 library(tidyr)
 library(dplyr)
 
@@ -44,8 +44,9 @@ timesl <- times %>% gather("Species2","time",2:ncol(times),na.rm=T)
 
 library(rjags)
 library(jagstools)
-load("~/Documents/bipartitemodelsBC/results/cnj_output-trunc1e+05.RData")
-load("~/Documents/bipartitemodelsBC/results/cnjlong-trunc1e+05.RData")
+#load("~/Documents/bipartitemodelsBC/results/cnj_output-trunc1e+05.RData")
+#load("~/Documents/bipartitemodelsBC/results/cnjlong-trunc1e+05.RData")
+# already loaded march 300k from running finalplotcode 
 host<-as.data.frame(jagsresults(output, params='hosts'))
 host$names <- rownames(host)
 host$row <- substring(host$names,regexpr("\\[",host$names)+1,regexpr(",",host$names)-1)
@@ -66,10 +67,23 @@ names(timesl3)[4:5] <- c("col","row")
 full <- merge(host,timesl3,by=c("col","row"))
 names(full)[5:9] <- c("q2.5","q25","q50","q75","q97.5")
 
+# add obshost
+obshost <- data.frame(obshost)
+obshost$species1.common <- row.names(obshost)
+obslong <- gather(obshost,"species2.common","obscount",1:16)
+obslong2 <- merge(obslong,species,by.x="species1.common",by.y="common")
+obslong3 <- merge(obslong2,species,by.x="species2.common",by.y="common")
+full2 <- left_join(full,obslong3,by=c("Species2"="dot.x","Species"="sci.y"))
+
+
 plot(full$mean ~ full$time)
 
 summary(lm(mean ~ time,data=full))
 summary(lm(q50 ~ time,data=full))
 
-cor.test(full$mean,full$time,method="spearman")
-
+cor.test(full2$mean,full2$time,method="spearman")
+cor.test(full2$q97.5,full2$time,method="spearman")
+cor.test(full2$obscount,full2$time,method="spearman")
+cor.test(full2$q50,full2$time,method="spearman")
+cor.test(full2$q2.5,full2$time,method="spearman")
+cor.test(full2$q25,full2$time,method="spearman")
