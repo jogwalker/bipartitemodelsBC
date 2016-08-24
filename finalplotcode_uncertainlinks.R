@@ -2,6 +2,7 @@
 # update for new laptop 29 April 2016
 # update for thesis revision 7 July
 # update for uncertain links (phil trans) revision 3 August
+# update again august 24
 
 
 library(coda,quietly=TRUE,verbose=FALSE)
@@ -60,6 +61,8 @@ prob.use1<-prob.use1[,c(2,1,3)]
 names(prob.use1)<-c( 'host.sp', 'par.sp', 'use')
 prob.use<-merge(x=prob.use1, y=agg, by = c('host.sp', 'par.sp') , all=T)
 prob.use[is.na(prob.use)] <- 0 
+prob.use$presence <- ifelse(prob.use$prev > 0, 1,0)
+
 
 # hist(prob.use$use, main = "Estimated Probability of Use", xlab="Probability of Use")
 # hist(prob.use$prev)
@@ -69,13 +72,14 @@ prob.use[is.na(prob.use)] <- 0
 # hist(inv.logit((alpha[,16,60])))
 # plot(prob.use$use ~ prob.use$prev)
 library(ggplot2)
-pdf("~/dat/bipartitemodelsBC/phil trans revision/probuse.pdf",height=4)
-ggplot(data=prob.use,aes(y=use,x=prev)) + geom_point() + theme_bw() + ylab("Mean estimate for use") + xlab("Observed prevalence") 
+# pdf("~/dat/bipartitemodelsBC/phil trans revision/probuse.pdf",height=4)
+pdf("~/dat/bipartitemodelsBC/phil trans revision/probuse-occurrence.pdf",height=4)
+ggplot(data=prob.use,aes(y=use,x=prev)) + geom_point() + theme_bw() + ylab("Mean estimate for occurrence") + xlab("Observed prevalence") 
 dev.off()
 
-pdf("~/dat/bipartitemodelsBC/phil trans revision/probuse2.pdf",height=4)
+# pdf("~/dat/bipartitemodelsBC/phil trans revision/probuse2.pdf",height=4)
 ggplot(data=prob.use,aes(y=use,x=prev)) + geom_count() + theme_bw() + ylab("Mean estimate for use") + xlab("Observed prevalence") 
-dev.off()
+# dev.off()
 
 
 print("Correlation between predicted probability of use and observed prevalence:")
@@ -104,9 +108,9 @@ cor(exp(no0$beta),no0$meancount)
 abund$logcount <- ifelse(abund$meancount==0,log(abund$meancount+1),log(abund$meancount))
 abund$log <- ifelse(abund$meancount==0,TRUE,FALSE)
 
-pdf("~/dat/bipartitemodelsBC/phil trans revision/abund.pdf",height=4)
+# pdf("~/dat/bipartitemodelsBC/phil trans revision/abund.pdf",height=4)
 ggplot(data=abund,aes(x=logcount,y=beta,colour=log)) + theme_bw() + ylab("Log predicted mean abundance") +xlab("Log observed mean count") + geom_point() + theme(legend.position="none") + geom_abline(intercept=0,slope=1)
-dev.off()
+# dev.off()
 
 
 
@@ -123,6 +127,7 @@ expabund$par.sp3 <- gsub("[a-z]*_",". ",expabund$par.sp)
 # # order by summed abundance
 expabundsort <- expabund %>% group_by(par.sp) %>% mutate(parsum = sum(beta))
 expabundsort2 <- expabundsort %>% group_by(host.sp) %>% mutate(hostsum = sum(beta))
+### going to reorder by use not abundance
 
 expabundsort2$par.sp <- gsub("_"," " ,expabundsort2$par.sp)
 expabundsort2$host.sp <- gsub("_"," " ,expabundsort2$host.sp)
@@ -137,6 +142,7 @@ dimnames(PMatmean) <- list(levels(long$par.sp),levels(long$host.sp))
 prob.use2<- melt(PMatmean)
 prob.use2<-prob.use2[,c(2,1,3)]
 names(prob.use2)<-c( 'host.sp', 'par.sp', 'use')
+
 
 prob.use2$host.sp2 <- gsub("_"," " ,prob.use2$host.sp)
 prob.use2$par.sp2 <- gsub("_"," " ,prob.use2$par.sp)
@@ -161,10 +167,10 @@ agg$par_sp <- gsub("_"," " ,agg$par.sp)
 probusesort3 <- left_join(probusesort2,agg,by=c("host.sp"="host_sp","par.sp"="par_sp"))
 probusesort3$mismatch <- (probusesort3$presence == 0 & probusesort3$use > 0.95)
 
-# this isn't that useful as presence == 1 for all use == 1 and vice versa
-pdf("~/dat/bipartitemodelsBC/phil trans revision/useheatmap-color.pdf",height=12)
-ggplot(probusesort3, aes(host.sp,par.sp)) + geom_tile(aes(fill = use,color=as.factor(presence))) + scale_fill_gradient(low = "white", high = "steelblue") + scale_color_manual(values=c("white","black")) + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) + theme(legend.position="none",axis.ticks = element_blank(), axis.text.x = element_text(size = base_size * 0.8, angle = 270, hjust = 0, colour = "grey50"),axis.text.y=element_text(size=base_size*0.7,vjust=0.25))
-dev.off()
+# # this isn't that useful as presence == 1 for all use == 1 and vice versa
+# pdf("~/dat/bipartitemodelsBC/phil trans revision/useheatmap-color.pdf",height=12)
+# ggplot(probusesort3, aes(host.sp,par.sp)) + geom_tile(aes(fill = use,color=as.factor(presence))) + scale_fill_gradient(low = "white", high = "steelblue") + scale_color_manual(values=c("white","black")) + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) + theme(legend.position="none",axis.ticks = element_blank(), axis.text.x = element_text(size = base_size * 0.8, angle = 270, hjust = 0, colour = "grey50"),axis.text.y=element_text(size=base_size*0.7,vjust=0.25))
+# dev.off()
 
 pdf("~/dat/bipartitemodelsBC/phil trans revision/useheatmap-scalebar.pdf",height=12)
 ggplot(probusesort2, aes(host.sp,par.sp)) + geom_tile(aes(fill =use),color="white") + scale_fill_gradient(low = "white", high = "black")  + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) + theme(axis.ticks = element_blank(), axis.text.x = element_text(size = base_size * 0.8, angle = 270, hjust = 0, colour = "grey50"),axis.text.y=element_text(size=base_size*0.7,vjust=0.25)) + labs(fill=expression(theta))
@@ -172,7 +178,8 @@ dev.off()
 
 
 useabund <- left_join(expabundsort2,probusesort2,by=c("host.sp","par.sp"))
-useabund2 <- useabund[order(useabund$parsum.x,useabund$hostsum.x,decreasing=TRUE),]
+# useabund2 <- useabund[order(useabund$parsum.x,useabund$hostsum.x,decreasing=TRUE),]
+useabund2 <- useabund[order(useabund$parsum.y,useabund$hostsum.y,decreasing=TRUE),]
 useabund2$host.sp <- with(useabund2,factor(host.sp,levels = (unique(as.character(host.sp)))))
 useabund2$par.sp <- with(useabund2,factor(par.sp,levels = rev(unique(as.character(par.sp)))))
 
@@ -184,7 +191,8 @@ useabund2$useabund4 <- ifelse(useabund2$use<0.05,NA,exp(useabund2$beta))
 # useabund2 <- useabund2[order(useabund$parsum.x,useabund$hostsum.x,decreasing=TRUE),]
 
 base_size <- 12
-pdf("~/dat/bipartitemodelsBC/phil trans revision/abundheatmap-color.pdf",height=12)
+# pdf("~/dat/bipartitemodelsBC/phil trans revision/abundheatmap-color.pdf",height=12)
+pdf("~/dat/bipartitemodelsBC/phil trans revision/abundheatmap-color-useorder.pdf",height=12)
 ggplot(useabund2, aes(host.sp,par.sp)) + geom_tile(aes(fill = useabund2), colour = "white") + scale_fill_gradient(low = "yellow", high = "red",na.value="grey90") + theme_grey(base_size = base_size) + labs(x = "", y = "") + scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) + theme(legend.position = "right", axis.ticks = element_blank(), axis.text.x = element_text(size = base_size * 0.8, angle = 270, hjust = 0, colour = "grey50"),axis.text.y=element_text(size=base_size*0.7)) + labs(fill=expression(beta))
 dev.off()
 
@@ -335,6 +343,7 @@ host$row <- substring(host$names,regexpr("\\[",host$names)+1,regexpr(",",host$na
 host$col <- substring(host$names,regexpr(",",host$names)+1,regexpr("\\]",host$names)-1)
 
 # observed
+rownames(mat.obs) <- gsub("_"," " ,rownames(mat.obs))
 obshost <- mat.obs %*% t(mat.obs)
 
 lowhost<- matrix(0,nrow=16,ncol=16,dimnames=dimnames(obshost))
@@ -457,12 +466,13 @@ fc2
 # 
 # 
 # pdf("~/dat/bipartitemodelsBC/figs/networks3.pdf",height=10,width=10)
-# par(mfrow=c(2,2),oma=c(0,0,0,0),mar=c(0,0,2,0))
-# plot.igraph(g0,layout=layout.circle(g0), edge.color="grey",edge.width=E(g0)$weight,main="Observed")
-# plot.igraph(g1,layout=layout.circle(g1), edge.color="grey",edge.width=E(g1)$weight,main="Lower bound")
-# plot.igraph(g2,layout=layout.circle(g2), edge.color="grey",edge.width=E(g2)$weight,main="Median")
-# plot.igraph(g3,layout=layout.circle(g3), edge.color="grey",edge.width=E(g3)$weight,main="Upper bound")
-# dev.off()
+pdf("~/dat/bipartitemodelsBC/figs/networks3-nounderscore.pdf",height=10,width=10)
+par(mfrow=c(2,2),oma=c(0,0,0,0),mar=c(0,0,2,0))
+plot.igraph(g0,layout=layout.circle(g0), edge.color="grey",edge.width=E(g0)$weight,main="Observed")
+plot.igraph(g1,layout=layout.circle(g1), edge.color="grey",edge.width=E(g1)$weight,main="Lower bound")
+plot.igraph(g2,layout=layout.circle(g2), edge.color="grey",edge.width=E(g2)$weight,main="Median")
+plot.igraph(g3,layout=layout.circle(g3), edge.color="grey",edge.width=E(g3)$weight,main="Upper bound")
+dev.off()
 
 # separate observed network into wild and domestic
 doms <- c("Cattle","Donkey","Horse","Sheep")
@@ -475,11 +485,11 @@ ebcd <- edge.betweenness.community(gd, directed=F)
 ebcw <- edge.betweenness.community(gw, directed=F)
 V(gd)$color <- membership(ebcd)
 V(gw)$color <- membership(ebcw)
-pdf("~/dat/bipartitemodelsBC/thesis revision/networks_sep.pdf",height=10,width=5)
+# pdf("~/dat/bipartitemodelsBC/thesis revision/networks_sep.pdf",height=10,width=5)
 par(mfrow=c(2,1),oma=c(0,0,0,0),mar=c(0,0,2,0))
 plot.igraph(gd,layout=layout.circle(gd), edge.color="grey",edge.width=E(gd)$weight,main="Domestic")
 plot.igraph(gw,layout=layout.circle(gw), edge.color="grey",edge.width=E(gw)$weight,main="Wild")
-dev.off()
+# dev.off()
 
 pdf("~/dat/bipartitemodelsBC/thesis revision/networks_sep2.pdf",height=10,width=15)
 par(mfrow=c(2,3),oma=c(0,0,0,0),mar=c(0,0,2,0))
